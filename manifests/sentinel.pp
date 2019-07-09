@@ -147,6 +147,13 @@
 #   Path to the client-reconfig script
 #
 #   Default: undef
+#
+# [*monitors*]
+#   Array of hash of the redis masters to monitor. Sample minimum required data:
+#   [{"name" => master name, "host" => redis master host, "port" => redis master port, "quorum" => quorum}]
+#
+#   Default: []
+#
 # == Actions:
 #   - Install and configure Redis Sentinel
 #
@@ -156,7 +163,7 @@
 #
 #   class {'redis::sentinel':
 #     down_after => 80000,
-#     log_file => '/var/log/redis/sentinel.log',
+#     log_file   => '/var/log/redis/sentinel.log',
 #   }
 #
 class redis::sentinel (
@@ -188,6 +195,7 @@ class redis::sentinel (
   $working_dir            = $::redis::params::sentinel_working_dir,
   $notification_script    = $::redis::params::sentinel_notification_script,
   $client_reconfig_script = $::redis::params::sentinel_client_reconfig_script,
+  $monitors               = $::redis::params::sentinel_monitors,
 ) inherits redis::params {
 
   unless defined(Package[$package_name]) {

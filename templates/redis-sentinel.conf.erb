@@ -6,18 +6,56 @@ dir <%= @working_dir %>
 <% if @daemonize -%>daemonize yes<% else -%>daemonize no<% end %>
 pidfile <%= @pid_file %>
 
+
+
+<%# Single master (stock config) %>
+<% if @monitors == [] %>
+
 sentinel monitor <%= @master_name %> <%= @redis_host %> <%= @redis_port %> <%= @quorum %>
 sentinel down-after-milliseconds <%= @master_name %> <%= @down_after %>
 sentinel parallel-syncs <%= @master_name %> <%= @parallel_sync %>
 sentinel failover-timeout <%= @master_name %> <%= @failover_timeout %>
+
 <% if @auth_pass -%>
 sentinel auth-pass <%= @master_name %> <%= @auth_pass %>
 <% end -%>
+
 <% if @notification_script -%>
 sentinel notification-script <%= @master_name %> <%= @notification_script %>
 <% end -%>
+
 <% if @client_reconfig_script -%>
 sentinel client-reconfig-script <%= @master_name %> <%= @client_reconfig_script %>
 <% end -%>
+
+<% end -%><%# end single master %>
+
+
+
+
+<%# Addition for our environment where there can be multiple clusters each with their own master %>
+<% @monitors.each do |master| %>
+
+sentinel monitor <%= master['name'] %> <%= master['host'] %> <%= master['port'] %> <%= master['quorum'] %>
+sentinel down-after-milliseconds <%= master['name'] %> <%= master['down_after'] ? master['down_after'] : @down_after %>
+sentinel parallel-syncs <%= master['name'] %> <%= master['parallel_sync'] ? master['parallel_sync'] : @parallel_sync %>
+sentinel failover-timeout <%= master['name'] %> <%= master['failover_timeout'] ? master['failover_timeout'] : @failover_timeout %>
+
+<% if master['notification_script'] %>
+sentinel notification-script <%= master['name'] %> <%=  master['notification_script'] %>
+<% end -%>
+
+<% if master['client_reconfig_script'] -%>
+sentinel client-reconfig-script <%= master['name'] %> <%= master['client_reconfig_script'] %>
+<% end -%>
+
+<% if master['auth_pass'] -%>
+sentinel auth-pass <%= master['name'] %> <%= master['auth_pass'] %>
+<% end -%>
+
+<% end -%><%# end multiple masters %>
+
+
+
 
 logfile <%= @log_file %>
