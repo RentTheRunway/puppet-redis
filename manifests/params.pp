@@ -75,7 +75,7 @@ class redis::params {
   $stop_writes_on_bgsave_error     = true
   $syslog_enabled                  = undef
   $syslog_facility                 = undef
-  $tcp_backlog                     = 511
+  $tcp_backlog                     = 1511
   $tcp_keepalive                   = 0
   $timeout                         = 0
   $ulimit                          = 65536
